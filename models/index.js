@@ -1,4 +1,4 @@
-import user from "./user.js"
+import user from "./User.js"
 import Booking from "./Booking.js"
 
  
