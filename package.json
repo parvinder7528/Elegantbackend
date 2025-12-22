@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "type": "module",
-  "main": "elegant.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node elegant.js",
-    "dev": "nodemon elegant.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "keywords": [],
   "author": "",
