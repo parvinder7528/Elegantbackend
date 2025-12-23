@@ -1,5 +1,6 @@
 import { schemaModel } from "../models/index.js";
-
+import bcrypt from "bcryptjs";
+import { generateToken } from "../utils/jwt.js";
 const admincontroller = {
   createBooking: async (req, res) => {
     try {
@@ -108,8 +109,122 @@ const admincontroller = {
       error: error.message,
     });
   }
-  }
+  },
 
+   getUserById: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const user = await schemaModel.UserModel.findById(id);
+
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: "User not found",
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        data: user,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        success: false,
+        message: "Server Error: Unable to fetch user",
+        error: error.message,
+      });
+    }
+  },
+
+
+  deleteUser:async(req,res)=>{
+     try {
+    const userId = req.params.id;
+
+    // Check if user exists
+    const user = await schemaModel.UserModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    await schemaModel.UserModel.findByIdAndDelete(userId);
+
+    res.status(200).json({
+      success: true,
+      message: "User deleted successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Server Error: Unable to delete user",
+      error: error.message,
+    });
+  }
+  },
+
+  getBookingsByUser:async(req,res)=>{
+      try {
+    const userId = req.params.userId;
+
+    const bookings = await schemaModel.BookingModel.find({ user: userId }); 
+    // Assuming `user` field in BookingModel stores user ID
+
+    res.status(200).json({
+      success: true,
+      count: bookings.length,
+      data: bookings,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Server Error: Unable to fetch bookings",
+      error: error.message,
+    });
+  }
+  },
+ login: async (req, res) => {
+    try {
+      const { email, password } = req.body;
+
+      if (!email || !password) {
+        return res.status(400).json({ success: false, message: "Email and password required" });
+      }
+
+      const user = await schemaModel.UserModel.findOne({ email });
+      if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+      if (user.role !== 0) {
+        return res.status(403).json({ success: false, message: "Access denied. Role not allowed" });
+      }
+
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) return res.status(401).json({ success: false, message: "Invalid password" });
+
+      // Create JWT token
+      const token = generateToken({ id: user._id, email: user.email, role: user.role });
+
+      res.status(200).json({
+        success: true,
+        message: "Login successful",
+        token,
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        },
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ success: false, message: "Server error", error: error.message });
+    }
+  },
 };
 
 export default admincontroller;
