@@ -113,8 +113,8 @@ const admincontroller = {
 
    getUserById: async (req, res) => {
     try {
-      const { id } = req.params;
-      const user = await schemaModel.UserModel.findById(id);
+      const id = req.params._id;
+      const user = await schemaModel.UserModel.findById({_id:id});
 
       if (!user) {
         return res.status(404).json({
@@ -140,10 +140,10 @@ const admincontroller = {
 
   deleteUser:async(req,res)=>{
      try {
-    const userId = req.params.id;
+    const userId = req.params._id;
 
     // Check if user exists
-    const user = await schemaModel.UserModel.findById(userId);
+    const user = await schemaModel.UserModel.findById({_id:id});
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -169,9 +169,9 @@ const admincontroller = {
 
   getBookingsByUser:async(req,res)=>{
       try {
-    const userId = req.params.userId;
+    const userId = req.params._id;
 
-    const bookings = await schemaModel.BookingModel.find({ user: userId }); 
+    const bookings = await schemaModel.BookingModel.find({ userId: userId }); 
     // Assuming `user` field in BookingModel stores user ID
 
     res.status(200).json({
