@@ -1,6 +1,7 @@
 import { schemaModel } from "../models/index.js";
 import bcrypt from "bcryptjs";
 import { generateToken } from "../utils/jwt.js";
+import mongoose from "mongoose";
 const admincontroller = {
   createBooking: async (req, res) => {
     try {
@@ -114,7 +115,7 @@ const admincontroller = {
    getUserById: async (req, res) => {
     try {
       const id = req.params._id;
-      const user = await schemaModel.UserModel.findById({_id:id});
+      const user = await schemaModel.UserModel.findById({_id:new mongoose.Types.ObjectId(id)});
 
       if (!user) {
         return res.status(404).json({
@@ -143,7 +144,7 @@ const admincontroller = {
     const userId = req.params._id;
 
     // Check if user exists
-    const user = await schemaModel.UserModel.findById({_id:id});
+    const user = await schemaModel.UserModel.findById({_id:new mongoose.Types.ObjectId(id)});
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -171,7 +172,7 @@ const admincontroller = {
       try {
     const userId = req.params._id;
 
-    const bookings = await schemaModel.BookingModel.find({ userId: userId }); 
+    const bookings = await schemaModel.BookingModel.find({ userId:new mongoose.Types.ObjectId(userId) }); 
     // Assuming `user` field in BookingModel stores user ID
 
     res.status(200).json({
