@@ -20,6 +20,9 @@ const userSchema = new mongoose.Schema(
       role: {
       type: Number,
       // required: true
+    },
+    password:{
+      type:String
     }
   },
   { timestamps: true }
