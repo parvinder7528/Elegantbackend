@@ -145,12 +145,12 @@ const admincontroller = {
 
     // Check if user exists
     const user = await schemaModel.UserModel.findById({_id:new mongoose.Types.ObjectId(userId)});
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
-    }
+    // if (!user) {
+    //   return res.status(404).json({
+    //     success: false,
+    //     message: "User not found",
+    //   });
+    // }
 
     await schemaModel.UserModel.findByIdAndDelete(userId);
 
