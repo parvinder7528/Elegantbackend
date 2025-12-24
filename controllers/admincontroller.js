@@ -113,59 +113,98 @@ const admincontroller = {
   },
 
    getUserById: async (req, res) => {
-    try {
-      const id = req.params._id;
-      const user = await schemaModel.UserModel.findById({_id:new mongoose.Types.ObjectId(id)});
+     try {
+    const { _id } = req.params;
 
-      if (!user) {
+    if (!_id) {
+      return res.status(400).json({
+        success: false,
+        message: "User ID is required",
+      });
+    }
+
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(_id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid User ID",
+      });
+    }
+
+    const user = await schemaModel.UserModel.aggregate([
+      { $match: { _id: new mongoose.Types.ObjectId(_id) } }
+    ]);
+
+    if (!user || user.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: user[0], // aggregate returns an array
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Server Error: Unable to fetch user",
+      error: error.message,
+    });
+  }
+  },
+
+
+ deleteUser: async (req, res) => {
+    try {
+      const { userId } = req.params;
+
+      if (!userId) {
+        return res.status(400).json({
+          success: false,
+          message: "User ID is required",
+        });
+      }
+
+      // Validate ObjectId
+      if (!mongoose.Types.ObjectId.isValid(userId)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid User ID",
+        });
+      }
+
+      // Check if user exists using aggregation
+      const user = await schemaModel.UserModel.aggregate([
+        {
+          $match: { _id: new mongoose.Types.ObjectId(userId) }
+        }
+      ]);
+
+      if (!user || user.length === 0) {
         return res.status(404).json({
           success: false,
           message: "User not found",
         });
       }
 
+      // Delete the user
+      await schemaModel.UserModel.findByIdAndDelete(userId);
+
       res.status(200).json({
         success: true,
-        data: user,
+        message: "User deleted successfully",
       });
     } catch (error) {
       console.error(error);
       res.status(500).json({
         success: false,
-        message: "Server Error: Unable to fetch user",
+        message: "Server Error: Unable to delete user",
         error: error.message,
       });
     }
-  },
-
-
-  deleteUser:async(req,res)=>{
-     try {
-    const userId = req.params._id;
-
-    // Check if user exists
-    const user = await schemaModel.UserModel.findById({_id:new mongoose.Types.ObjectId(userId)});
-    // if (!user) {
-    //   return res.status(404).json({
-    //     success: false,
-    //     message: "User not found",
-    //   });
-    // }
-
-    await schemaModel.UserModel.findByIdAndDelete(userId);
-
-    res.status(200).json({
-      success: true,
-      message: "User deleted successfully",
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      success: false,
-      message: "Server Error: Unable to delete user",
-      error: error.message,
-    });
-  }
   },
 
   getBookingsByUser:async(req,res)=>{

@@ -6,9 +6,9 @@ const router = express.Router();
 // Public routes only
 router.post("/bookingcreate", admincontroller.createBooking);
 router.get("/getalluser", admincontroller.getUserAll);
-router.get("/getUserById/:id", admincontroller.getUserById);
+router.get("/getUserById/:_id", admincontroller.getUserById);
 
-router.delete("/user/:id", admincontroller.deleteUser);
+router.delete("/user/:_id", admincontroller.deleteUser);
 
 // Get bookings by user ID
 router.get("/bookings/:userId", admincontroller.getBookingsByUser);
