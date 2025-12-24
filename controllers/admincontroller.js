@@ -114,9 +114,9 @@ const admincontroller = {
 
    getUserById: async (req, res) => {
      try {
-    const { _id } = req.params;
+    const { userId } = req.query;
 
-    if (!_id) {
+    if (!userId) {
       return res.status(400).json({
         success: false,
         message: "User ID is required",
@@ -124,7 +124,7 @@ const admincontroller = {
     }
 
     // Validate ObjectId
-    if (!mongoose.Types.ObjectId.isValid(_id)) {
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({
         success: false,
         message: "Invalid User ID",
@@ -132,7 +132,7 @@ const admincontroller = {
     }
 
     const user = await schemaModel.UserModel.aggregate([
-      { $match: { _id: new mongoose.Types.ObjectId(_id) } }
+      { $match: { _id: new mongoose.Types.ObjectId(userId) } }
     ]);
 
     if (!user || user.length === 0) {
@@ -159,8 +159,9 @@ const admincontroller = {
 
  deleteUser: async (req, res) => {
     try {
-      const { userId } = req.params;
-
+      console.log("şsssss")
+      const { userId } = req.query;
+console.log(userId)
       if (!userId) {
         return res.status(400).json({
           success: false,
