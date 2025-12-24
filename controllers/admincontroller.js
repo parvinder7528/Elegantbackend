@@ -188,11 +188,10 @@ const admincontroller = {
     });
   }
   },
- login: async (req, res) => {
-   try {
+login: async (req, res) => {
+  try {
     const { email, password } = req.body;
 
-    // 1️⃣ Validate input
     if (!email || !password) {
       return res.status(400).json({
         success: false,
@@ -200,7 +199,6 @@ const admincontroller = {
       });
     }
 
-    // 2️⃣ Find user
     const user = await schemaModel.UserModel.findOne({ email });
     if (!user) {
       return res.status(404).json({
@@ -209,7 +207,6 @@ const admincontroller = {
       });
     }
 
-    // 3️⃣ Role check (ADMIN = 0)
     if (user.role !== 0) {
       return res.status(403).json({
         success: false,
@@ -217,20 +214,16 @@ const admincontroller = {
       });
     }
 
-    // 4️⃣ Password exists check
     if (!user.password) {
       return res.status(400).json({
         success: false,
-        message: "Password not set for this user",
+        message: "Password not set",
       });
     }
-
-    // 5️⃣ Compare password (FIXED)
-    const isMatch = await bcrypt.compare(
-      String(password),
-      String(user.password)
-    );
-
+console.log(password.toString())
+console.log(user.password)
+    // 🔐 bcrypt compare (SAFE)
+    const isMatch = await bcrypt.compare(password.toString(), user.password);
     if (!isMatch) {
       return res.status(401).json({
         success: false,
@@ -238,14 +231,13 @@ const admincontroller = {
       });
     }
 
-    // 6️⃣ Generate token
     const token = generateToken({
       id: user._id,
       email: user.email,
       role: user.role,
     });
+    return
 
-    // 7️⃣ Success response
     return res.status(200).json({
       success: true,
       message: "Login successful",
@@ -259,6 +251,7 @@ const admincontroller = {
     });
 
   } catch (error) {
+    return
     console.error("LOGIN ERROR:", error);
     return res.status(500).json({
       success: false,
@@ -266,7 +259,8 @@ const admincontroller = {
       error: error.message,
     });
   }
-  },
+}
+
 };
 
 export default admincontroller;
