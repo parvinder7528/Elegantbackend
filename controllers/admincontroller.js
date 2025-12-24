@@ -189,41 +189,83 @@ const admincontroller = {
   }
   },
  login: async (req, res) => {
-    try {
-      const { email, password } = req.body;
+   try {
+    const { email, password } = req.body;
 
-      if (!email || !password) {
-        return res.status(400).json({ success: false, message: "Email and password required" });
-      }
-
-      const user = await schemaModel.UserModel.findOne({ email });
-      if (!user) return res.status(404).json({ success: false, message: "User not found" });
-
-      if (user.role !== 0) {
-        return res.status(403).json({ success: false, message: "Access denied. Role not allowed" });
-      }
-
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) return res.status(401).json({ success: false, message: "Invalid password" });
-
-      // Create JWT token
-      const token = generateToken({ id: user._id, email: user.email, role: user.role });
-
-      res.status(200).json({
-        success: true,
-        message: "Login successful",
-        token,
-        user: {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-        },
+    // 1️⃣ Validate input
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Email and password are required",
       });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ success: false, message: "Server error", error: error.message });
     }
+
+    // 2️⃣ Find user
+    const user = await schemaModel.UserModel.findOne({ email });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // 3️⃣ Role check (ADMIN = 0)
+    if (user.role !== 0) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied",
+      });
+    }
+
+    // 4️⃣ Password exists check
+    if (!user.password) {
+      return res.status(400).json({
+        success: false,
+        message: "Password not set for this user",
+      });
+    }
+
+    // 5️⃣ Compare password (FIXED)
+    const isMatch = await bcrypt.compare(
+      String(password),
+      String(user.password)
+    );
+
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid password",
+      });
+    }
+
+    // 6️⃣ Generate token
+    const token = generateToken({
+      id: user._id,
+      email: user.email,
+      role: user.role,
+    });
+
+    // 7️⃣ Success response
+    return res.status(200).json({
+      success: true,
+      message: "Login successful",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+
+  } catch (error) {
+    console.error("LOGIN ERROR:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
+  }
   },
 };
 
