@@ -1,6 +1,6 @@
 import express from "express";
 import admincontroller from "../controllers/admincontroller.js";
-import { authMiddleware } from "../middleware/authMiddleware.js";
+import { authMiddleware } from "../middlewear/authMiddleware.js";
 const router = express.Router();
 
 // Public routes only

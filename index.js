@@ -41,7 +41,14 @@ dotenv.config();
 // Connect database
 connectDB();
 app.use( cors());
-
+// app.use(cors({
+//   origin: [
+//     "http://localhost:5000",
+//     "http://localhost:3000",
+//     "https://elegant1-we27.vercel.app" // your live frontend
+//   ],
+//   credentials: true,
+// }));
 // Parse JSON body
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
