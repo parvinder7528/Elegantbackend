@@ -144,7 +144,7 @@ const admincontroller = {
     const userId = req.params._id;
 
     // Check if user exists
-    const user = await schemaModel.UserModel.findById({_id:new mongoose.Types.ObjectId(id)});
+    const user = await schemaModel.UserModel.findById({_id:new mongoose.Types.ObjectId(userId)});
     if (!user) {
       return res.status(404).json({
         success: false,
