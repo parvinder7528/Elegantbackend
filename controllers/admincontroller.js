@@ -236,7 +236,6 @@ console.log(user.password)
       email: user.email,
       role: user.role,
     });
-    return
 
     return res.status(200).json({
       success: true,
@@ -251,7 +250,6 @@ console.log(user.password)
     });
 
   } catch (error) {
-    return
     console.error("LOGIN ERROR:", error);
     return res.status(500).json({
       success: false,
