@@ -53,6 +53,7 @@ const admincontroller = {
       name: name.trim(),
       email: email.trim(),
       phone: phone.trim(),
+      role:1
     });
 
     // 4️⃣ Create booking
@@ -101,7 +102,7 @@ const admincontroller = {
 
    getUserAll :async (req, res) => {
   try {
-    const users = await schemaModel.UserModel.find(); // fetch all users from database
+    const users = await schemaModel.UserModel.find({role:1}); // fetch all users from database
     res.status(200).json({
       success: true,
       count: users.length,
